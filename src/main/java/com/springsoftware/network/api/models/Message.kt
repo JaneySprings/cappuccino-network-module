@@ -3,7 +3,7 @@ package com.springsoftware.network.api.models
 import com.google.gson.annotations.SerializedName
 import java.util.ArrayList
 
-data class MessageEntity(val messages: List<MessageItem>, val count: Int)
+data class MessagesDTO(val messages: List<MessageItem>, val count: Int)
 
 data class MessageItem(
     val peerId: Int,
@@ -85,7 +85,7 @@ data class MessageItem(
     }
 }
 
-data class MessageResponse(
+data class MessagesResponse(
     @SerializedName("count") val count: Int,
     @SerializedName("items") val items: List<Message>,
     @SerializedName("profiles") val profiles: List<User>?,

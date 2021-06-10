@@ -1,4 +1,4 @@
-package com.springsoftware.network.api.request.fields
+package com.springsoftware.network.api.request
 
 /**
  * Date: 03.02.2021
@@ -60,4 +60,12 @@ object UserHelper {
     const val trending = "trending"
     const val tv = "tv"
     const val verified = "verified"
+
+    fun defaultParamsList() = listOf(lastSeen, online, city, photo100).joinToString(",")
+
+    fun extendedParamsList() = listOf(
+        about, activities, bDate, blacklisted, blacklistedByMe, canSendFriendRequest,
+        canWritePrivateMessage, city, connections, contacts, counters, country, friendStatus,
+        lastSeen, online, photo100, photo200, photoMax_orig, screenName, site, status
+    ).joinToString(",")
 }

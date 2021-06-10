@@ -1,4 +1,4 @@
-package com.springsoftware.network.api.request.fields
+package com.springsoftware.network.api.request
 
 /**
  * Date: 03.02.2021

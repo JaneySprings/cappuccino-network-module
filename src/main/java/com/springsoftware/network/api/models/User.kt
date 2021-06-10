@@ -39,7 +39,6 @@ data class UserExtended(
         @SerializedName("can_write_private_message") val canWritePrivateMessage: Int,
         @SerializedName("career") val career: List<Career>,
         @SerializedName("city") val city: City?,
-        @SerializedName("common_count") val commonCount: Int,
         @SerializedName("skype") val skype: String?,
         @SerializedName("facebook") val facebook: String?,
         @SerializedName("twitter") val twitter: String?,

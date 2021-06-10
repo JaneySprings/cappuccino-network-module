@@ -3,8 +3,6 @@ package com.springsoftware.network.api.request
 import com.google.gson.Gson
 import com.springsoftware.network.api.models.UserExtended
 import com.springsoftware.network.api.models.UserResponse
-import com.springsoftware.network.api.models.VKUser
-import com.springsoftware.network.api.request.fields.UserHelper
 import com.vk.api.sdk.requests.VKRequest
 import org.json.JSONObject
 import java.util.ArrayList
@@ -16,19 +14,10 @@ object UsersApi {
      * User actions: [https://vk.com/dev/users.get]
      */
     class Get(ids: List<Int>): VKRequest<List<UserExtended>>("users.get") {
-        private val fields = listOf(
-            UserHelper.about, UserHelper.activities, UserHelper.bDate, UserHelper.blacklisted,
-            UserHelper.blacklistedByMe, UserHelper.canSendFriendRequest,
-            UserHelper.canWritePrivateMessage, UserHelper.city, UserHelper.connections,
-            UserHelper.contacts, UserHelper.counters, UserHelper.commonCount, UserHelper.country,
-            UserHelper.friendStatus, UserHelper.lastSeen, UserHelper.online, UserHelper.photo100,
-            UserHelper.photo200, UserHelper.photoMax_orig, UserHelper.screenName, UserHelper.site,
-            UserHelper.status)
-
         init {
             if (ids.isNotEmpty())
                 addParam("user_ids", ids.chunked(USER_LIMIT)[0].joinToString(","))
-            addParam("fields", fields.joinToString(","))
+            addParam("fields", UserHelper.extendedParamsList())
         }
 
         override fun parse(r: JSONObject): List<UserExtended> {
@@ -52,14 +41,11 @@ object UsersApi {
      * User actions: [https://vk.com/dev/users.getFollowers]
      */
     class GetFollowers(uid: Int, count: Int, offset: Int): VKRequest<UserResponse>("users.getFollowers") {
-        private val fields = listOf(UserHelper.lastSeen, UserHelper.online, UserHelper.city,
-            UserHelper.photo100)
-
         init {
             addParam("user_id", uid)
             addParam("offset", offset)
             addParam("count", count)
-            addParam("fields", fields)
+            addParam("fields", UserHelper.defaultParamsList())
         }
 
         override fun parse(r: JSONObject): UserResponse {
@@ -106,13 +92,11 @@ object UsersApi {
      * User actions: [https://vk.com/dev/users.search]
      */
     class Search(query: String, count: Int): VKRequest<UserResponse>("users.search") {
-        private val fields = listOf(UserHelper.lastSeen, UserHelper.online, UserHelper.photo100)
-
         init {
             addParam("q", query)
             addParam("count", count)
             addParam("offset",0)
-            addParam("fields", fields.joinToString(","))
+            addParam("fields", UserHelper.defaultParamsList())
         }
 
         override fun parse(r: JSONObject): UserResponse {

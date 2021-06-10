@@ -2,7 +2,7 @@ package com.springsoftware.network.api.models
 
 import com.google.gson.annotations.SerializedName
 
-data class LongPollEntity(
+data class LongPollDTO(
     val history: List<List<Int>>,
     val messages: List<MessageItem>,
     val newPts: Int
