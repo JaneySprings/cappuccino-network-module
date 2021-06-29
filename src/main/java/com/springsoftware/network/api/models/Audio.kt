@@ -4,7 +4,12 @@ import android.os.Parcelable
 import com.google.gson.annotations.SerializedName
 import kotlinx.android.parcel.Parcelize
 
-/* Audio model */
+
+fun Audio.toShareMeta(): String {
+    return if (this.accessKey.isNullOrEmpty()) "audio${this.ownerId}_${this.id}"
+    else "audio${this.ownerId}_${this.id}_${this.accessKey}"
+}
+
 @Parcelize
 data class Audio(
     @SerializedName("artist") val artist: String,

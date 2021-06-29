@@ -2,8 +2,6 @@ package com.springsoftware.network.api.request
 
 import android.net.Uri
 import com.google.gson.Gson
-import com.springsoftware.network.api.mappers.toConversationItems
-import com.springsoftware.network.api.mappers.toMessageItems
 import com.springsoftware.network.api.models.*
 import com.vk.api.sdk.VKApiManager
 import com.vk.api.sdk.VKApiResponseParser
@@ -19,6 +17,19 @@ import kotlin.collections.ArrayList
 object MessagesApi {
     const val LONG_POLL_VERSION = 3
     const val CHAT_ID_DELTA = 2000000000
+
+    /** Long Polling actions */
+    object LongPoll {
+        const val HISTORY_POSITION_EVENT = 0
+        const val HISTORY_POSITION_MESSAGE_ID = 1
+        const val HISTORY_POSITION_CHAT_ID = 3
+
+        const val EVENT_DELETE_MESSAGE = 2
+        const val EVENT_NEW_MESSAGE = 4
+        const val EVENT_EDIT_MESSAGE = 5
+    }
+
+
 
     /**
      * Date: 04.02.2021
@@ -112,7 +123,7 @@ object MessagesApi {
      * Author: Nikita Romanov
      * Messages actions: [https://vk.com/dev/messages.getConversations]
      */
-    class GetConversations(count: Int, offset: Int): VKRequest<ConversationsDTO>("messages.getConversations") {
+    class GetConversations(count: Int, offset: Int): VKRequest<ConversationsResponse>("messages.getConversations") {
         init {
             addParam("offset", offset)
             addParam("count", count)
@@ -121,11 +132,9 @@ object MessagesApi {
             addParam("fields", UserHelper.defaultParamsList())
         }
 
-        override fun parse(r: JSONObject): ConversationsDTO {
+        override fun parse(r: JSONObject): ConversationsResponse {
             val response = r.getJSONObject("response").toString()
-            val dto = Gson().fromJson(response, ConversationsResponse::class.java)
-
-            return ConversationsDTO(dto.toConversationItems(), dto.count)
+            return Gson().fromJson(response, ConversationsResponse::class.java)
         }
     }
     /**
@@ -133,7 +142,7 @@ object MessagesApi {
      * Author: Nikita Romanov
      * Messages actions: [https://vk.com/dev/messages.getConversationsById]
      */
-    class GetConversationsById(ids: List<Int>): VKRequest<ConversationsDTO>("messages.getConversationsById") {
+    class GetConversationsById(ids: List<Int>): VKRequest<ConversationsByIdResponse>("messages.getConversationsById") {
         private val fields = listOf(UserHelper.lastSeen, UserHelper.online, UserHelper.photo100)
 
         init {
@@ -142,11 +151,9 @@ object MessagesApi {
             addParam("fields", fields.joinToString(","))
         }
 
-        override fun parse(r: JSONObject): ConversationsDTO {
+        override fun parse(r: JSONObject): ConversationsByIdResponse {
             val response = r.getJSONObject("response").toString()
-            val dto = Gson().fromJson(response, ConversationsByIdResponse::class.java)
-
-            return ConversationsDTO(dto.toConversationItems(), dto.count)
+            return Gson().fromJson(response, ConversationsByIdResponse::class.java)
         }
     }
     /**
@@ -154,7 +161,7 @@ object MessagesApi {
      * Author: Nikita Romanov
      * Messages actions: [https://vk.com/dev/messages.getHistory]
      */
-    class GetHistory(uid: Int, count: Int, offset: Int): VKRequest<MessagesDTO>("messages.getHistory") {
+    class GetHistory(uid: Int, count: Int, offset: Int): VKRequest<MessagesResponse>("messages.getHistory") {
         init {
             addParam("offset", offset)
             addParam("count", count)
@@ -162,10 +169,9 @@ object MessagesApi {
             addParam("rev",0)
             addParam("extended",1)
         }
-        override fun parse(r: JSONObject): MessagesDTO {
+        override fun parse(r: JSONObject): MessagesResponse {
             val response = r.getJSONObject("response").toString()
-            val dto = Gson().fromJson(response, MessagesResponse::class.java)
-            return MessagesDTO(dto.toMessageItems(), dto.count)
+            return Gson().fromJson(response, MessagesResponse::class.java)
         }
     }
     /**
@@ -207,22 +213,16 @@ object MessagesApi {
      * Author: Nikita Romanov
      * Messages actions: [https://vk.com/dev/messages.getLongPollHistory]
      */
-    class GetLongPollHistory(keys: Array<Int>): VKRequest<LongPollDTO>("messages.getLongPollHistory") {
+    class GetLongPollHistory(keys: Array<Int>): VKRequest<LongPollResponse>("messages.getLongPollHistory") {
         init {
             addParam("ts", keys[0])
             addParam("pts", keys[1])
             addParam("fields", UserHelper.defaultParamsList())
             addParam("lp_version", LONG_POLL_VERSION)
         }
-        override fun parse(r: JSONObject): LongPollDTO {
+        override fun parse(r: JSONObject): LongPollResponse {
             val response = r.getJSONObject("response").toString()
-            val dto = Gson().fromJson(response, LongPollResponse::class.java)
-            val messages = java.util.ArrayList<MessageItem>()
-
-            for (i in dto.messages.items.indices)
-                messages.add(MessageItem.fromResponse(dto.messages.items[i], dto.profiles, dto.groups))
-
-            return LongPollDTO(dto.history, dto.toMessageItems(), dto.newPts)
+            return Gson().fromJson(response, LongPollResponse::class.java)
         }
     }
     /**
@@ -274,6 +274,7 @@ object MessagesApi {
     class Send(
         private val uid: Int,
         private val text: String,
+        private val stickerId: Int,
 
         private val photos: List<Uri>,
         private val data: List<String>,
@@ -302,6 +303,9 @@ object MessagesApi {
 
             if (uploadData.isNotEmpty())
                 callBuilder.args("attachment", uploadData.joinToString(","))
+
+            if (stickerId != 0)
+                callBuilder.args("sticker_id", stickerId)
 
             return manager.execute(callBuilder.build(), ResponseApiParser())
         }

@@ -2,32 +2,6 @@ package com.springsoftware.network.api.models
 
 import com.google.gson.annotations.SerializedName
 
-data class ConversationsDTO(val items: List<ConversationItem>, val count: Int)
-
-data class ConversationItem(
-    val membersCount: Int,
-    val unreadCount: Int,
-    val chatId: Int,
-    val date: Int,
-
-    val senderName: String,
-    val photo100: String,
-    val title: String,
-    val type: String,
-    val text: String,
-
-    val isRead: Boolean,
-    val online: Boolean,
-    val disabledPush: Boolean,
-
-    val lastSeen: LastSeen?,
-    val pinnedMessage: Message?
-) {
-    companion object {
-        const val TAG_SELF_SENDER = "CAPPUCCINO_SYSTEM_TAG_SENDER_SELF"
-    }
-}
-
 data class ConversationsByIdResponse(
     @SerializedName("count") val count: Int,
     @SerializedName("items") val items: List<Conversation>,

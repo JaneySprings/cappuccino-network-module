@@ -12,12 +12,14 @@ import org.json.JSONObject
 import java.util.ArrayList
 
 object FriendsApi {
+    const val REQUEST_USERS_COUNT = 60
+
     /**
      * Date: 29.04.2021
      * Author: Nikita Romanov
      * Friends actions: [https://vk.com/dev/friends.search]
      */
-    class Search(uid: Int, count: Int, q: String): VKRequest<UserResponse>("friends.search") {
+    class Search(uid: Int, q: String, count: Int = REQUEST_USERS_COUNT): VKRequest<UserResponse>("friends.search") {
         init {
             addParam("user_id", uid)
             addParam("q", q)
@@ -35,7 +37,7 @@ object FriendsApi {
      * Author: Nikita Romanov
      * Friends actions: [https://vk.com/dev/friends.getSuggestions]
      */
-    class GetSuggestions(count: Int, offset: Int): VKRequest<UserResponse>("friends.getSuggestions") {
+    class GetSuggestions(offset: Int, count: Int = REQUEST_USERS_COUNT): VKRequest<UserResponse>("friends.getSuggestions") {
         init {
             addParam("count", count)
             addParam("offset", offset)
@@ -51,7 +53,7 @@ object FriendsApi {
      * Author: Nikita Romanov
      * Friends actions: [https://vk.com/dev/friends.getRequests]
      */
-    class GetRequests(out: Int, count: Int, offset: Int): VKRequest<UserResponse>("friends.getRequests") {
+    class GetRequests(out: Int, offset: Int, count: Int = REQUEST_USERS_COUNT): VKRequest<UserResponse>("friends.getRequests") {
         init {
             addParam("offset", offset)
             addParam("count", count)
@@ -73,8 +75,8 @@ object FriendsApi {
      */
     class GetMutual(
         private val id: Int,
-        private val count: Int,
-        private val order: String
+        private val order: String,
+        private val count: Int = REQUEST_USERS_COUNT
     ): ApiCommand<List<User>>() {
         override fun onExecute(manager: VKApiManager): List<User> {
             val userIds = getMutualIds(manager)
@@ -139,7 +141,7 @@ object FriendsApi {
      * Author: Nikita Romanov
      * Friends actions: [https://vk.com/dev/friends.get]
      */
-    class Get(uid: Int, count: Int, order: String, offset: Int): VKRequest<UserResponse>("friends.get") {
+    class Get(uid: Int, order: String, offset: Int, count: Int = REQUEST_USERS_COUNT): VKRequest<UserResponse>("friends.get") {
         init {
             addParam("user_id", uid)
             addParam("order", order)
